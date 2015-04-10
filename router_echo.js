@@ -13,44 +13,45 @@ net.createServer(function (sock){
 	console.log('CONNECTED' + sock.remoteAddress + ':' + sock.remotePort);
 	sock.isNew = true;	// Label that this is a new socket
 	sock.on('data',function(data){
-		if(sock.isNew === true){
-			// if this is a new endpoint client connection
-			console.log(util.inspect(data));
-			console.log(data.toString());
-			if(true){
-				// Currently there is no decision making condition
-				var id = data[2]*256*256 + data[1]*256 + data[0];
-				console.log(id);
-				if(id > 14000000){
-					// For T61 devices
-					sock.deviceName = 'T61A'+id.toString();
-				}else{
-					sock.deviceName = 'T51A'+id.toString();
-				}
-				console.log('Endpoint client: ' + sock.deviceName);
-				sock.isNew = false;
-				sock.mqttClient = mqtt.connect(MQTTSERVER);
-				sock.mqttClient.on('connect', function(){
-					console.log('MQTT Server connected');
-					sock.mqttClient.subscribe(sock.deviceName+'S');
-				});			
-				sock.mqttClient.on('message', function(topic, message){
-					// console.log(util.inspect(message));
-					sock.write(message);
-				});			
-			}else{
-				// Client is sending random data
-				// Close the connection
-				sock.destroy();					
-			}
+		sock.write(data);
+		// if(sock.isNew === true){
+		// 	// if this is a new endpoint client connection
+		// 	console.log(util.inspect(data));
+		// 	console.log(data.toString());
+		// 	if(true){
+		// 		// Currently there is no decision making condition
+		// 		var id = data[2]*256*256 + data[1]*256 + data[0];
+		// 		console.log(id);
+		// 		if(id > 14000000){
+		// 			// For T61 devices
+		// 			sock.deviceName = 'T61A'+id.toString();
+		// 		}else{
+		// 			sock.deviceName = 'T51A'+id.toString();
+		// 		}
+		// 		console.log('Endpoint client: ' + sock.deviceName);
+		// 		sock.isNew = false;
+		// 		sock.mqttClient = mqtt.connect(MQTTSERVER);
+		// 		sock.mqttClient.on('connect', function(){
+		// 			console.log('MQTT Server connected');
+		// 			sock.mqttClient.subscribe(sock.deviceName+'S');
+		// 		});			
+		// 		sock.mqttClient.on('message', function(topic, message){
+		// 			// console.log(util.inspect(message));
+		// 			sock.write(message);
+		// 		});			
+		// 	}else{
+		// 		// Client is sending random data
+		// 		// Close the connection
+		// 		sock.destroy();					
+		// 	}
 
-		}else{
-			console.log('Rx: '+util.inspect(data));
-			sock.mqttClient.publish(sock.deviceName+'S', data);
-		}
+		// }else{
+		// 	console.log('Rx: '+util.inspect(data));
+		// 	sock.mqttClient.publish(sock.deviceName+'S', data);
+		// }
 	});
 	sock.on('close', function(data){
-		sock.mqttClient.end();
+		// sock.mqttClient.end();
 		console.log('CLOSED: '+ sock.deviceName+'E');
 	})
 }).listen(epPORT,HOST);
