@@ -10,10 +10,12 @@ var MQTTSERVER = 'mqtt://do.xavierzip.com';	// MQTT Server Address
 
 // Create a TCP server for endpoint client connections
 net.createServer(function (sock){
+	sock.setMaxListeners(0);
 	console.log('CONNECTED' + sock.remoteAddress + ':' + sock.remotePort);
 	sock.isNew = true;	// Label that this is a new socket
 	sock.on('data',function(data){
 		sock.write(data);
+		//sock.pipe(sock);
 		// if(sock.isNew === true){
 		// 	// if this is a new endpoint client connection
 		// 	console.log(util.inspect(data));
